@@ -13,11 +13,11 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
   }
 }
 
-jarName in assembly := "scalding-job-assembly.jar"
+jarName in assembly := "spray-akka-r-server-job-assembly.jar"
 
 test in assembly := {}
 
-mainClass in assembly := Some("com.visiblemeasures.dactar.scalding.useragent.Main")
+mainClass in assembly := Some("us.marek.akka.Boot")
 
 name := "demo"
 
@@ -25,7 +25,7 @@ version := "1.0"
 
 organization := "us_marek"
 
-scalaVersion := "2.10.2"
+scalaVersion := "2.10.3"
 
 scalaSource in Compile <<= baseDirectory(_ / "src/main/scala")
 
@@ -36,20 +36,27 @@ resourceDirectory in Compile := baseDirectory.value / "resources"
 resourceDirectory in Test := baseDirectory.value / "test-resources"
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-                  "Maven Central" at "http://repo1.maven.org")
+                  "Maven Central" at "http://repo1.maven.org",
+                  "Spray Repo" at "http://repo.spray.io")
 
-{
-  val akkaVersion = "2.3.0-RC2"
-  libraryDependencies ++= Seq(
-    "com.typesafe.akka"    %    "akka-actor_2.10"                %    akkaVersion,
-    "com.typesafe.akka"    %    "akka-remote_2.10"               %    akkaVersion,
-    "com.typesafe.akka"    %    "akka-slf4j_2.10"                %    akkaVersion,
-    "com.typesafe.akka"    %    "akka-testkit_2.10"              %    akkaVersion,
-    "com.typesafe.akka"    %    "akka-kernel_2.10"               %    akkaVersion,
-    "org.scalatest"        %    "scalatest_2.10"                 %    "1.9.1"         %    "test",
-    "com.github.axel22"    %    "scalameter_2.10"                %    "0.4"
-  )
-}
+  libraryDependencies ++= {
+    val akkaVersion = "2.3.0"
+    val sprayV = "1.3.0"
+    Seq(
+      "io.spray"             %     "spray-can"                 %    sprayV,
+      "io.spray"             %     "spray-routing"             %    sprayV,
+      "io.spray"             %     "spray-testkit"             %    sprayV         % "test",
+      "com.typesafe.akka"    %%    "akka-actor"                %    akkaVersion,
+      "com.typesafe.akka"    %%    "akka-remote"               %    akkaVersion,
+      "com.typesafe.akka"    %%    "akka-slf4j"                %    akkaVersion,
+      "com.typesafe.akka"    %%    "akka-testkit"              %    akkaVersion,
+      "com.typesafe.akka"    %%    "akka-kernel"               %    akkaVersion,
+      "org.json4s"           %%    "json4s-native"             %    "3.2.4",
+      "org.scalatest"        %%    "scalatest"                 %    "1.9.1"         %    "test",
+      "com.github.axel22"    %%    "scalameter"                %    "0.4"
+    )
+  }
+  
 
 EclipseKeys.useProjectId := false
 
@@ -57,7 +64,7 @@ EclipseKeys.withSource := true
 
 javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
 
-scalacOptions += "-deprecation"
+scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Scala
 
@@ -81,10 +88,10 @@ shellPrompt <<= name(name => { state: State =>
 
 fork := true
 
-fork in Test := true
+fork in Test := false
 
 javaOptions += "-Xmx2G"
 
-parallelExecution := false
+parallelExecution := true
 
 parallelExecution in Test := false
