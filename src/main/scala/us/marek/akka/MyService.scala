@@ -20,7 +20,7 @@ import akka.util.Timeout
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 
-
+@edu.umd.cs.findbugs.annotations.SuppressWarnings
 class MyServiceActor extends Actor with HttpService with Json4sSupport {
 
   var master: ActorRef = null
@@ -29,7 +29,7 @@ class MyServiceActor extends Actor with HttpService with Json4sSupport {
   implicit val timeout = Timeout(5, TimeUnit.SECONDS)
 
   override def preStart = {
-    
+
     val actorCount = 4
     master = context.actorOf(Props(classOf[Master], actorCount))
   }

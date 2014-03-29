@@ -1,6 +1,27 @@
 import AssemblyKeys._
+import de.johoop.findbugs4sbt.FindBugs._
 
 Seq(assemblySettings: _*)
+
+addCompilerPlugin("org.brianmckenna" %% "wartremover" % "0.8")
+
+scalacOptions in (Compile, compile) += "-P:wartremover:only-warn-traverser:org.brianmckenna.wartremover.warts.Unsafe"
+
+//scalacOptions in (Compile, compile) += "-P:wartremover:traverser:org.brianmckenna.wartremover.warts.Unsafe"
+
+org.scalastyle.sbt.ScalastylePlugin.Settings
+
+CodeQualityBuild.Settings
+
+//PmdSettings
+
+findbugsSettings
+
+findbugsReportType := Some(de.johoop.findbugs4sbt.ReportType.FancyHtml)
+
+findbugsReportPath := Some(crossTarget.value / "findbugs.html")
+
+//codequality.CodeQualityPlugin.Settings
 
 mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
   {
@@ -29,7 +50,11 @@ scalaVersion := "2.10.3"
 
 scalaSource in Compile <<= baseDirectory(_ / "src/main/scala")
 
-scalaSource in Test <<= baseDirectory(_ / "test/main/scala")
+scalaSource in Test <<= baseDirectory(_ / "src/test/scala")
+
+javaSource in Compile <<= baseDirectory(_ / "src/main/java")
+
+javaSource in Test <<= baseDirectory(_ / "src/test/java")
 
 resourceDirectory in Compile := baseDirectory.value / "resources"
 
@@ -37,6 +62,8 @@ resourceDirectory in Test := baseDirectory.value / "test-resources"
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
                   "Maven Central" at "http://repo1.maven.org",
+                  "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
+                  "Sonarype releases" at "https://oss.sonatype.org/content/repositories/releases/",
                   "Spray Repo" at "http://repo.spray.io")
 
   libraryDependencies ++= {
@@ -45,7 +72,7 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
     Seq(
       "io.spray"             %     "spray-can"                 %    sprayV,
       "io.spray"             %     "spray-routing"             %    sprayV,
-      "io.spray"             %     "spray-testkit"             %    sprayV         % "test",
+      "io.spray"             %     "spray-testkit"             %    sprayV          %   "test",
       "com.typesafe.akka"    %%    "akka-actor"                %    akkaVersion,
       "com.typesafe.akka"    %%    "akka-remote"               %    akkaVersion,
       "com.typesafe.akka"    %%    "akka-slf4j"                %    akkaVersion,
@@ -53,7 +80,8 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
       "com.typesafe.akka"    %%    "akka-kernel"               %    akkaVersion,
       "org.json4s"           %%    "json4s-native"             %    "3.2.4",
       "org.scalatest"        %%    "scalatest"                 %    "1.9.1"         %    "test",
-      "com.github.axel22"    %%    "scalameter"                %    "0.4"
+      "com.github.axel22"    %%    "scalameter"                %    "0.4",
+      "net.sourceforge.findbugs"             %     "annotations"               %    "1.3.2"         %    "compile"
     )
   }
   

@@ -3,6 +3,7 @@ package us.marek.akka
 import akka.actor.{Actor, ActorRef, Props}
 import akka.routing.{ActorRefRoutee, Router, RoundRobinRoutingLogic}
 
+@edu.umd.cs.findbugs.annotations.SuppressWarnings
 class Master(routeeCount: Int) extends Actor {
   
   val router = {
